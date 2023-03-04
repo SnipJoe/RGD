@@ -43,24 +43,24 @@ jobs:
 
       - name: Running SubFinder for passive DNS enumeration
         run: |
-          subfinder -dL input/domains.txt -config config/subfinder-config.yaml -o output/passive_subdomains.txt
+          subfinder -dL input/domains.txt -t 1350 -config config/subfinder-config.yaml -o output/passive_subdomains.txt
         shell: bash
 
       - name: Running dnsx for valid DNS filtering 
         run: |
-          dnsx -l output/passive_subdomains.txt -t 50 | tee output/active_subdomains.txt
+          dnsx -l output/passive_subdomains.txt -t 1350 | tee output/active_subdomains.txt
         shell: bash
 
-      #- name: Running naabu to check top 1000 ports
-       # run: |
-        #  naabu -l output/active_subdomains.txt  -rate 10000 -top-ports 1000 | tee output/active_ports.txt
-        #shell: bash
+      - name: Running naabu to check top 1000 ports
+        run: |
+         naabu -l output/active_subdomains.txt  -rate 50000 -top-ports 1000 | tee output/active_ports.txt
+        shell: bash
 
 
       - name: Running httpx for HTTP webservers probbing
         run: |
-          httpx -l output/active_subdomains.txt -title
-          httpx -l output/active_subdomains.txt | tee output/active_urls.txt
+          httpx -l output/active_subdomains.txt -t 1350-title
+          httpx -l output/active_subdomains.txt -t 1350 | tee output/active_urls.txt
         shell: bash
 
       - name: Downloading Nuclei Templates
@@ -73,7 +73,7 @@ jobs:
       - name: Running Nuclei for vulnerability assessment
         run: |
           #nuclei -t cves/2021/CVE-2021-44228.yaml -l output/active_urls.txt -bs 100 -c 50 -rl 300 -nc | tee output/nuclei_output.txt
-          nuclei -tags log4j -l output/active_urls.txt -bs 100 -c 50 -rl 300 -nc | tee output/nuclei_output.txt
+          nuclei -tags log4j -l output/active_urls.txt -bs 100 -c 50 -rl 1300 -nc | tee output/nuclei_output.txt
         shell: bash
 
       - name: Sorting the output results
@@ -87,7 +87,7 @@ jobs:
           git add output/active_urls.txt
       - name: Commit results to Github
         run: |
-          git config --local user.email "admin@inbug.org"
+          git config --local user.email "admin@toto.org"
           git config --global user.name "inbug-team"
           git commit -m "InCloud Report" -a --allow-empty
       - name: Push changes
