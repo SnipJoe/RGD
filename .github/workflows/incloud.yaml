@@ -59,8 +59,8 @@ jobs:
 
       - name: Running httpx for HTTP webservers probbing
         run: |
-          httpx -l output/active_subdomains.txt -t 1350 -title
-          httpx -l output/active_subdomains.txt -t 1350 | tee output/active_urls.txt
+          httpx -l output/active_ports.txt -t 1350 -title
+          httpx -l output/active_ports.txt -t 1350 | tee output/active_urls.txt
         shell: bash
 
       - name: Downloading Nuclei Templates
